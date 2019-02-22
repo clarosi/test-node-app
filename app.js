@@ -8,7 +8,9 @@ const bodyParser = require('body-parser');
 
 const defaultRoute = require('./api/routes/default');
 const feedRoute = require('./api/routes/feed');
-const utils = require('./shared/utils/functions');
+const userRoute = require('./api/routes/user');
+const utilsFunctions = require('./shared/utils/functions');
+const utilsStrings = require('./shared/utils/strings');
 
 // Lets us define an invironment variables inside .env file
 require('dotenv').config();
@@ -22,14 +24,11 @@ const storage = multer.diskStorage({
   }
 });
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/png' 
-  || file.mimetype === 'image/jpg'
-  || file.mimetype === 'image/jpeg'
-  ) {
+  if (utilsStrings.imgFileExt.test(file.originalname)) {
     cb(null, true);
   }
   else {
-    cb(null, false)
+    cb(null, false);
   }
 }
 
@@ -47,10 +46,11 @@ app.use(cors());
 // Routes
 app.use('/default', defaultRoute);
 app.use('/feed', feedRoute);
+app.use('/user', userRoute);
 
 // Unknown routes/end points
 app.use((req, res, next) => {
-  utils.customError('End point not found.', 404);
+  utilsFunctions.customError('End point not found.', 404);
 });
 
 app.use((error, req, res, next) => {
